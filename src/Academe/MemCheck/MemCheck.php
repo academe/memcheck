@@ -3,6 +3,7 @@
 /**
  * This library is used to keep an eye on memory usage when operating a big process over a loop.
  * It will keep track of the average loop memory usage.
+ * @todo some of these variable names are a little unclear, e.g. user-imposed limits and system limits.
  */
 
 namespace Academe\MemCheck;
@@ -31,6 +32,7 @@ class MemCheck {
 
     /**
      * The total time limit read from the PHP ini setting or set in the app.
+     * @todo Allow the application to override this with shorter times.
      *
      * @var integer
      */
@@ -111,6 +113,29 @@ class MemCheck {
         // Capture the time limit of the process.
         // If zero, then there is no limit.
         $this->timeLimit = ini_get('max_execution_time');
+    }
+
+    /**
+     * Override the system time limit; set the maximum time you want the process to run for.
+     *
+     * @param integer $limit The time limit yiu want to set, in seconds.
+     * @return integer The time limit that was set.
+     */
+    public function setTimeLimit($limit)
+    {
+        // The limit imposed by the current process settings.
+        // We cannot run for any longer than this, and we don't want to
+        // mess around trying to adjust this time here. That can be done externally.
+        $systemLimit = ini_get('max_execution_time');
+
+        if (empty($systemLimit)) {
+            // No system limit, so just take the limit provided.
+            $this->timeLimit = $limit;
+        } else {
+            $this->timeLimit = min($limit, $systemLimit);
+        }
+
+        return $this->timeLimit;
     }
 
     /**
