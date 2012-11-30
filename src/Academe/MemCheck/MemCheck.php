@@ -147,8 +147,9 @@ class MemCheck {
     }
 
     /**
-     * Indicate the end of a loop iteration.
+     * Signal the end of a loop iteration.
      *
+     * @return boolean the result of checkContinue().
      */
     public function endIteration()
     {

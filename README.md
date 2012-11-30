@@ -25,9 +25,9 @@ Typical Usage
         // do loop functionality
         // ...
         
-        $MemCheck->endIteration();
-        if (! $MemCheck->checkContinue()) {
+        if (! $MemCheck->endIteration()) {
             // Clean up, note where we got to, and exit loop.
+            // ...
             break;
         }
     }
