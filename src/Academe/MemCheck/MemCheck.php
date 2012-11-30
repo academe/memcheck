@@ -28,7 +28,7 @@ class MemCheck {
      *
      * @var integer
      */
-    private $memoryLimit = NULL;
+    private $totalMemory = NULL;
 
     /**
      * The total time limit read from the PHP ini setting or set in the app.
@@ -36,7 +36,7 @@ class MemCheck {
      *
      * @var integer
      */
-    private $timeLimit = NULL;
+    private $maxExecutionTime = NULL;
 
     /**
      * Count of loop iterations.
@@ -108,20 +108,20 @@ class MemCheck {
     {
         // Record the memory limit for this process.
         // This is the point we will run out of memory.
-        $this->memoryLimit = $this->convertBytes(ini_get('memory_limit'));
+        $this->totalMemory = $this->convertBytes(ini_get('memory_limit'));
 
         // Capture the time limit of the process.
         // If zero, then there is no limit.
-        $this->timeLimit = ini_get('max_execution_time');
+        $this->maxExecutionTime = ini_get('max_execution_time');
     }
 
     /**
-     * Override the system time limit; set the maximum time you want the process to run for.
+     * Limit the maximum execution time.
      *
      * @param integer $limit The time limit yiu want to set, in seconds.
      * @return integer The time limit that was set.
      */
-    public function setTimeLimit($limit)
+    public function setMaxExecutionTime($limit)
     {
         // The limit imposed by the current process settings.
         // We cannot run for any longer than this, and we don't want to
@@ -130,12 +130,12 @@ class MemCheck {
 
         if (empty($systemLimit)) {
             // No system limit, so just take the limit provided.
-            $this->timeLimit = $limit;
+            $this->maxExecutionTime = $limit;
         } else {
-            $this->timeLimit = min($limit, $systemLimit);
+            $this->maxExecutionTime = min($limit, $systemLimit);
         }
 
-        return $this->timeLimit;
+        return $this->maxExecutionTime;
     }
 
     /**
@@ -212,11 +212,11 @@ class MemCheck {
         // Protect from divide-by-zero
         if ($this->meanMemoryUsage == 0) $this->meanMemoryUsage = 1;
 
-        $remainingMemory = $this->memoryLimit - $this->currentMemory;
+        $remainingMemory = $this->totalMemory - $this->currentMemory;
         $memoryIterations = floor($remainingMemory / $this->meanMemoryUsage);
 
-        if (!empty($this->timeLimit) && $this->meanTime > 0) {
-            $timeRemain = $this->timeLimit - $this->startTime + $this->currentTime;
+        if (!empty($this->maxExecutionTime) && $this->meanTime > 0) {
+            $timeRemain = $this->maxExecutionTime - $this->startTime + $this->currentTime;
             $timeIterations = floor($timeRemain / $this->meanTime);
 
             return min($memoryIterations, $timeIterations);
@@ -232,7 +232,7 @@ class MemCheck {
      */
     public function percentMemoryRemain()
     {
-        $available = $this->memoryLimit - $this->startMemory;
+        $available = $this->totalMemory - $this->startMemory;
         $used = $this->currentMemory - $this->startMemory;
 
         return round(100 - ($used / $available) * 100);
@@ -246,13 +246,13 @@ class MemCheck {
      */
     public function percentTimeRemain()
     {
-        if (empty($this->timeLimit)) return -1;
+        if (empty($this->maxExecutionTime)) return -1;
 
         // CHECKME: the available time for the loop should exclude any
         // time spent before the loop was initialised. I'm not sure how we
         // would measure that without setting this class up right at the start
         // of the request and taking a time snapshot then.
-        $available = $this->timeLimit;
+        $available = $this->maxExecutionTime;
         $used = $this->currentTime - $this->startTime;
 
         return round(100 - ($used / $available) * 100);
