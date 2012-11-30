@@ -30,3 +30,12 @@ Typical Usage
             break;
         }
     }
+
+$MemCheck->checkContinue() will return true if there enough resources left,
+and will return false if there is enough memory for iterationLimit further
+loop iterations or there is at most percentLimit percentage of available
+memory left.
+
+The idea is that you can clean up nicely when memory is running low
+rather than get aborted unexpectedly in the middle of a processing loop
+iteration.
