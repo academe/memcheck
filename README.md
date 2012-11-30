@@ -12,10 +12,11 @@ Typical Usage
     
     $MemCheck = new Academe\MemCheck\MemCheck();
     
-    // Set warning when memory reaches 10% remaining, or there is enough
-    // memory to run five or fewer more iterations of the loop.
+    // Set warning when memory reaches 10% remaining, ot time reachs 10% rermaining,
+    // or there is enough memory or time to run five or fewer more iterations of the loop.
     $MemCheck->iterationLimit = 5;
-    $MemCheck->percentLimit = 10;
+    $MemCheck->percentMemoryLimit = 10;
+    $MemCheck->percentTimeLimit = 10;
     
     // Initialise.
     $MemCheck->startLoop();
@@ -31,7 +32,8 @@ Typical Usage
         }
     }
 
-$MemCheck->checkContinue() will return true if there enough resources left,
+$MemCheck->checkContinue() will return true if there enough resources (time
+and memory) left,
 and will return false if there is enough memory for iterationLimit further
 loop iterations or there is at most percentLimit percentage of available
 memory left.
