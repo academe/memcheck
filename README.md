@@ -52,6 +52,14 @@ by throwing another job onto a queue for processing further, or by returning
 a message to the web browser to indicte another call is needed to run the next
 batch of records.
 
+Some assumptions this class makes:
+
+* It is initialised close to the start of the loop, so as memory is used, the assumption 
+is that the usage is just from the loop iterations and not the application initialisation.
+* Each loop iteration will use approximately the same amout of memory. The class takes an 
+everage (mean) for each iteration to estimate how many more iterations will fit into the 
+remaining memory, and is not clever enough to throw out outlaying extreme iterations.
+
 ### LICENCE
 
 (MIT Licence)
