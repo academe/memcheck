@@ -259,8 +259,9 @@ class MemCheck {
     }
 
     /**
-     * Returns true if it is time to stop the loop and clean up,
-     * while resources are still available to do so.
+     * Returns false if it is time to stop the loop and clean up,
+     * while resources are still available to do so. Returns true if
+     * resources are available to continue with the loop.
      *
      * @return boolean true if enough resources remain for another iteration of the loop.
      */
